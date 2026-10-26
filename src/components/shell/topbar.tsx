@@ -1,11 +1,12 @@
-import { Fragment } from "react";
-import { CircleCheck, Clock, Menu, PanelLeft } from "lucide-react";
+import { Fragment, useEffect } from "react";
+import { CircleCheck, Clock, Menu, PanelLeft, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { AccountMenu } from "@/components/shell/account-menu";
 import { ThemeToggle } from "@/components/shell/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAssistant } from "@/state/assistant-context";
 import { useDemo } from "@/state/demo-context";
 import { SECTION_LABELS } from "@/lib/route-labels";
 import { useActiveProject } from "@/state/use-active-project";
@@ -32,6 +33,21 @@ function Topbar({ onOpenDrawer }: TopbarProps) {
   const location = useLocation();
   const { sidebarCollapsed, setSidebarCollapsed } = useDemo();
   const { project, installation } = useActiveProject();
+  const { isOpen: isAssistantOpen, setOpen: setAssistantOpen } = useAssistant();
+  const hasProject = project !== null;
+
+  useEffect(() => {
+    if (!hasProject) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setAssistantOpen(!isAssistantOpen);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [hasProject, isAssistantOpen, setAssistantOpen]);
+
   const projectPath = project === null ? null : `/p/${project.id}`;
   const crumbs = buildCrumbs(location.pathname, project?.name ?? null, projectPath);
 
@@ -99,6 +115,13 @@ function Topbar({ onOpenDrawer }: TopbarProps) {
             Menunggu pemasangan
           </StatusBadge>
         </>
+      )}
+      {project === null ? null : (
+        <Button variant="secondary" size="sm" onClick={() => setAssistantOpen(!isAssistantOpen)} aria-expanded={isAssistantOpen} aria-keyshortcuts="Control+K">
+          <Sparkles aria-hidden="true" />
+          <span className="hidden sm:inline">Tanya</span>
+          <span className="sr-only sm:hidden">Tanya asisten</span>
+        </Button>
       )}
       <ThemeToggle />
       <AccountMenu />

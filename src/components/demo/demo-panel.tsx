@@ -10,7 +10,14 @@ import type { AuthScenario } from "@/mock/auth-service";
 import type { ProjectRole } from "@/mock/types";
 import { useAuth } from "@/state/auth-context";
 import { useDemo } from "@/state/demo-context";
-import type { DensitySetting, MotionSetting, OverviewScenario, ThemeSetting } from "@/state/demo-context";
+import type {
+  AiScenario,
+  DensitySetting,
+  LiveScenario,
+  MotionSetting,
+  OverviewScenario,
+  ThemeSetting,
+} from "@/state/demo-context";
 
 const AUTH_SCENARIO_OPTIONS: { value: AuthScenario; label: string }[] = [
   { value: "berhasil", label: "Berhasil" },
@@ -21,7 +28,7 @@ const AUTH_SCENARIO_OPTIONS: { value: AuthScenario; label: string }[] = [
   { value: "galat-jaringan", label: "Jaringan galat" },
 ];
 
-const WORKSPACE_KEY_PREFIXES = ["tracer-uiux:workspace:", "tracer-uiux:config:"];
+const WORKSPACE_KEY_PREFIXES = ["tracer-uiux:workspace:", "tracer-uiux:config:", "tracer-uiux:feedback:", "tracer-uiux:funnels:"];
 
 // Menghapus project buatan, undangan yang sudah dijawab, dan pengaturan project tiruan
 function clearDemoData(): void {
@@ -43,6 +50,19 @@ const SCENARIO_OPTIONS: { value: OverviewScenario; label: string }[] = [
   { value: "kosong", label: "Kosong" },
   { value: "galat", label: "Galat" },
   { value: "menunggu", label: "Menunggu pemasangan" },
+];
+
+const LIVE_OPTIONS: { value: LiveScenario; label: string }[] = [
+  { value: "ramai", label: "Ramai" },
+  { value: "sepi", label: "Sepi" },
+  { value: "kosong", label: "Kosong" },
+  { value: "terputus", label: "Terputus" },
+];
+
+const AI_OPTIONS: { value: AiScenario; label: string }[] = [
+  { value: "normal", label: "Normal" },
+  { value: "galat", label: "Galat" },
+  { value: "batas", label: "Batas harian" },
 ];
 
 const ROLE_OPTIONS: { value: ProjectRole; label: string }[] = [
@@ -248,6 +268,14 @@ function DemoPanel() {
                 options={SCENARIO_OPTIONS}
                 onChange={demo.setOverviewScenario}
               />
+            </Field>
+
+            <Field label="Skenario Live Users" hint="Jumlah pengunjung aktif dan keadaan sambungan di halaman Live Users.">
+              <Segmented label="Skenario Live Users" value={demo.liveScenario} options={LIVE_OPTIONS} onChange={demo.setLiveScenario} />
+            </Field>
+
+            <Field label="Skenario asisten AI" hint="Galat menolak setiap pertanyaan. Batas harian mengunci kolom tanya.">
+              <Segmented label="Skenario asisten AI" value={demo.aiScenario} options={AI_OPTIONS} onChange={demo.setAiScenario} />
             </Field>
 
             <Field label="Peran" hint="Admin membuka grup Admin di sidebar dan banner mode lihat saja.">

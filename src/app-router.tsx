@@ -2,8 +2,14 @@ import { Navigate, RouterProvider, createBrowserRouter } from "react-router";
 import { RedirectIfAuthed, RequireAuth } from "@/components/auth/route-guards";
 import { AppShell } from "@/components/shell/app-shell";
 import { ClickMapPage } from "@/pages/click-map-page";
+import { FeedbackPage } from "@/pages/feedback-page";
+import { FeedbackWidgetPage } from "@/pages/feedback-widget-page";
+import { FunnelBuilderPage } from "@/pages/funnel-builder-page";
+import { FunnelPage } from "@/pages/funnel-page";
+import { FunnelResultPage } from "@/pages/funnel-result-page";
 import { InstallationPage } from "@/pages/installation-page";
 import { InvitationsPage } from "@/pages/invitations-page";
+import { LiveUsersPage } from "@/pages/live-users-page";
 import { LoginCodePage } from "@/pages/login-code-page";
 import { LoginPage } from "@/pages/login-page";
 import { OverviewPage } from "@/pages/overview-page";
@@ -53,6 +59,13 @@ const router = createBrowserRouter([
           { path: "p/:projectId/sessions/:sessionId", element: <SessionDetailPage /> },
           { path: "p/:projectId/click-map", element: <ClickMapPage /> },
           { path: "p/:projectId/scroll-map", element: <ScrollMapPage /> },
+          { path: "p/:projectId/live", element: <LiveUsersPage /> },
+          { path: "p/:projectId/feedback", element: <FeedbackPage /> },
+          { path: "p/:projectId/funnel", element: <FunnelPage /> },
+          { path: "p/:projectId/funnel/new", element: <FunnelBuilderPage /> },
+          { path: "p/:projectId/funnel/:funnelId", element: <FunnelResultPage /> },
+          { path: "p/:projectId/funnel/:funnelId/edit", element: <FunnelBuilderPage /> },
+          { path: "p/:projectId/feedback/widget", element: <FeedbackWidgetPage /> },
           { path: "p/:projectId/installation", element: <InstallationPage /> },
           { path: "p/:projectId/settings", element: <SettingsPage /> },
           {

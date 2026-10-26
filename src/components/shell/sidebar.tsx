@@ -6,6 +6,7 @@ import { ADMIN_ITEMS, PROJECT_FOOTER_ITEMS, PROJECT_GROUPS } from "@/components/
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useDemo } from "@/state/demo-context";
+import { useLive } from "@/state/live-context";
 import { useActiveProject } from "@/state/use-active-project";
 import type { InstallationStatus } from "@/mock/types";
 
@@ -16,10 +17,12 @@ type EntryProps = {
   collapsed: boolean;
   end?: boolean;
   installation?: InstallationStatus;
+  // Jumlah kecil di ujung kanan, misalnya pengunjung aktif
+  count?: number;
   onNavigate?: () => void;
 };
 
-function NavEntry({ to, label, icon: Icon, collapsed, end, installation, onNavigate }: EntryProps) {
+function NavEntry({ to, label, icon: Icon, collapsed, end, installation, count, onNavigate }: EntryProps) {
   const link = (
     <NavLink
       to={to}
@@ -42,6 +45,17 @@ function NavEntry({ to, label, icon: Icon, collapsed, end, installation, onNavig
             aria-hidden="true"
           />
           {collapsed ? <span className="sr-only">{label}</span> : <span className="flex-1 truncate">{label}</span>}
+          {count === undefined || count === 0 ? null : (
+            <span
+              aria-label={`${count} aktif`}
+              className={cn(
+                "rounded-xs bg-primary-soft px-1.5 font-mono text-label tabular-nums text-primary-pressed",
+                collapsed && "absolute right-1 top-1 px-1",
+              )}
+            >
+              {count}
+            </span>
+          )}
           {installation === undefined ? null : (
             <span
               role="img"
@@ -82,6 +96,7 @@ type SidebarContentProps = {
 function SidebarContent({ collapsed, onNavigate }: SidebarContentProps) {
   const { role } = useDemo();
   const { project, installation } = useActiveProject();
+  const { activeCount } = useLive();
   const base = project === null ? null : `/p/${project.id}`;
 
   return (
@@ -105,6 +120,7 @@ function SidebarContent({ collapsed, onNavigate }: SidebarContentProps) {
                       label={item.label}
                       icon={item.icon}
                       collapsed={collapsed}
+                      count={item.indicator === "live" && installation === "detected" ? activeCount : undefined}
                       onNavigate={onNavigate}
                     />
                   </li>

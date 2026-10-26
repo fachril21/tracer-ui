@@ -7,6 +7,8 @@ type ThemeSetting = "system" | "light" | "dark";
 type MotionSetting = "system" | "reduce" | "full";
 type DensitySetting = "padat" | "lega";
 type OverviewScenario = "alami" | "memuat" | "kosong" | "galat" | "menunggu";
+type LiveScenario = "ramai" | "sepi" | "kosong" | "terputus";
+type AiScenario = "normal" | "galat" | "batas";
 
 type DemoSettings = {
   theme: ThemeSetting;
@@ -19,6 +21,8 @@ type DemoSettings = {
 type DemoState = DemoSettings & {
   overviewScenario: OverviewScenario;
   authScenario: AuthScenario;
+  liveScenario: LiveScenario;
+  aiScenario: AiScenario;
   isPanelOpen: boolean;
 };
 
@@ -30,6 +34,8 @@ type DemoActions = {
   setSidebarCollapsed: (value: boolean) => void;
   setOverviewScenario: (value: OverviewScenario) => void;
   setAuthScenario: (value: AuthScenario) => void;
+  setLiveScenario: (value: LiveScenario) => void;
+  setAiScenario: (value: AiScenario) => void;
   setPanelOpen: (value: boolean) => void;
   resetAll: () => void;
 };
@@ -48,6 +54,8 @@ const DEFAULT_STATE: DemoState = {
   ...DEFAULT_SETTINGS,
   overviewScenario: "alami",
   authScenario: "berhasil",
+  liveScenario: "ramai",
+  aiScenario: "normal",
   isPanelOpen: false,
 };
 
@@ -112,6 +120,8 @@ function DemoProvider({ children }: { children: ReactNode }) {
       setSidebarCollapsed: (sidebarCollapsed: boolean) => patch({ sidebarCollapsed }),
       setOverviewScenario: (overviewScenario: OverviewScenario) => patch({ overviewScenario }),
       setAuthScenario: (authScenario: AuthScenario) => patch({ authScenario }),
+      setLiveScenario: (liveScenario: LiveScenario) => patch({ liveScenario }),
+      setAiScenario: (aiScenario: AiScenario) => patch({ aiScenario }),
       setPanelOpen: (isPanelOpen: boolean) => patch({ isPanelOpen }),
       resetAll: () => setState({ ...DEFAULT_STATE, isPanelOpen: true }),
     }),
@@ -128,4 +138,4 @@ function useDemo(): DemoState & DemoActions {
 }
 
 export { DemoProvider, useDemo };
-export type { DensitySetting, MotionSetting, OverviewScenario, ThemeSetting };
+export type { AiScenario, DensitySetting, LiveScenario, MotionSetting, OverviewScenario, ThemeSetting };

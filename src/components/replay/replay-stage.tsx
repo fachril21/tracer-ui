@@ -14,7 +14,7 @@ const ASPECT: Record<MockSession["device"], string> = {
 };
 
 // Kerangka halaman tiruan: balok-balok abu yang menandai letak elemen, bukan tampilan situs asli
-function WireframePage({ path }: { path: string }) {
+export function WireframePage({ path }: { path: string }) {
   const seed = path.length % 3;
   return (
     <div aria-hidden="true" className="absolute inset-0 text-border-control">

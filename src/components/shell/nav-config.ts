@@ -1,4 +1,16 @@
-import { History, LayoutDashboard, MailCheck, MousePointerClick, Plug, ScrollText, Settings, FolderOpen } from "lucide-react";
+import {
+  FolderOpen,
+  Funnel,
+  History,
+  LayoutDashboard,
+  MailCheck,
+  MessageSquareText,
+  MousePointerClick,
+  Plug,
+  Radio,
+  ScrollText,
+  Settings,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type NavItem = {
@@ -8,7 +20,7 @@ type NavItem = {
   // Dipasang di belakang /p/:projectId, string kosong = beranda project
   path: string;
   // Hanya penanda khusus: titik status pemasangan
-  indicator?: "installation";
+  indicator?: "installation" | "live";
 };
 
 type NavGroup = {
@@ -17,7 +29,6 @@ type NavGroup = {
   items: NavItem[];
 };
 
-// Item untuk fitur yang belum dibangun (Live Users, Funnel, Feedback) sengaja tidak ada
 const PROJECT_GROUPS: NavGroup[] = [
   {
     id: "ringkasan",
@@ -27,7 +38,10 @@ const PROJECT_GROUPS: NavGroup[] = [
   {
     id: "rekaman",
     label: "Rekaman",
-    items: [{ id: "sesi", label: "Histori Sesi", icon: History, path: "/sessions" }],
+    items: [
+      { id: "sesi", label: "Histori Sesi", icon: History, path: "/sessions" },
+      { id: "live", label: "Live Users", icon: Radio, path: "/live", indicator: "live" },
+    ],
   },
   {
     id: "analitik",
@@ -35,7 +49,13 @@ const PROJECT_GROUPS: NavGroup[] = [
     items: [
       { id: "peta-klik", label: "Peta Klik", icon: MousePointerClick, path: "/click-map" },
       { id: "peta-gulir", label: "Peta Gulir", icon: ScrollText, path: "/scroll-map" },
+      { id: "funnel", label: "Funnel", icon: Funnel, path: "/funnel" },
     ],
+  },
+  {
+    id: "masukan",
+    label: "Masukan",
+    items: [{ id: "feedback", label: "Feedback", icon: MessageSquareText, path: "/feedback" }],
   },
 ];
 

@@ -3,6 +3,9 @@ const SECTION_LABELS: Record<string, string> = {
   sessions: "Histori Sesi",
   "click-map": "Peta Klik",
   "scroll-map": "Peta Gulir",
+  live: "Live Users",
+  funnel: "Funnel",
+  feedback: "Feedback",
   installation: "Pemasangan",
   settings: "Pengaturan Project",
 };

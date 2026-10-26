@@ -9,6 +9,9 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/state/auth-context";
+import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import { AssistantProvider } from "@/state/assistant-context";
+import { LiveProvider } from "@/state/live-context";
 import { useDemo } from "@/state/demo-context";
 import { useActiveProject } from "@/state/use-active-project";
 
@@ -53,6 +56,8 @@ function AppShell() {
   useDocumentTitle();
 
   return (
+    <LiveProvider>
+    <AssistantProvider>
     <div className="flex min-h-svh lg:h-svh lg:overflow-hidden">
       <a
         href="#konten-utama"
@@ -97,8 +102,11 @@ function AppShell() {
           </div>
         </main>
       </div>
+      <AssistantPanel />
       <DemoPanel />
     </div>
+    </AssistantProvider>
+    </LiveProvider>
   );
 }
 

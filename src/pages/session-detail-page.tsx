@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CircleHelp, SearchX, TriangleAlert } from "lucide-react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
+import { AskButton } from "@/components/assistant/ask-button";
 import { EventTimeline } from "@/components/replay/event-timeline";
 import { ReplayControls } from "@/components/replay/replay-controls";
 import { ReplayStage } from "@/components/replay/replay-stage";
@@ -71,6 +72,19 @@ function IntegrityNote({ session, gapAt }: { session: MockSession; gapAt: number
 function SessionPlayer({ project, session }: { project: MockProject; session: MockSession }) {
   const replay = useMemo(() => buildReplay(session), [session]);
   const playback = usePlayback(replay.durationMs);
+  const [params] = useSearchParams();
+  const seekSeconds = Number(params.get("t"));
+  const { seek } = playback;
+  const durationSeconds = session.durationSeconds;
+  const durationMs = replay.durationMs;
+
+  // Tautan dari asisten membawa detik di sesi asli, dipetakan ke panjang rekaman tiruan
+  useEffect(() => {
+    if (Number.isFinite(seekSeconds) && seekSeconds > 0 && durationSeconds > 0) {
+      seek((seekSeconds / durationSeconds) * durationMs);
+    }
+  }, [seekSeconds, durationSeconds, durationMs, seek]);
+
   const gapAtSeconds = replay.gap === null ? null : (replay.gap.from * replay.durationMs) / 1000;
 
   return (
@@ -90,6 +104,11 @@ function SessionPlayer({ project, session }: { project: MockProject; session: Mo
               {`Skor masalah ${session.problemScore}`}
             </StatusBadge>
           ) : null}
+          <span className="ml-auto">
+            <AskButton request={{ kind: "session", sessionId: session.id }} label={`Ringkas sesi ${session.id}`}>
+              Ringkas sesi ini
+            </AskButton>
+          </span>
         </div>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 xl:grid-cols-6">
           <MetaItem label="Mulai" value={formatDateTime(session.startedAt)} />
