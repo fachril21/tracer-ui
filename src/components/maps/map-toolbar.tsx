@@ -1,19 +1,13 @@
+import { PeriodControl } from "@/components/filters/period-control";
 import { Segmented } from "@/components/ui/segmented";
 import type { DashboardQueryApi } from "@/hooks/use-dashboard-query";
 import { DIMENSIONS } from "@/mock/dimensions";
 import type { DeviceKind } from "@/mock/page-model";
-import type { PeriodPreset } from "@/mock/types";
 
 const DEVICE_OPTIONS: { value: DeviceKind; label: string }[] = [
   { value: "Desktop", label: "Desktop" },
   { value: "Tablet", label: "Tablet" },
   { value: "Mobile", label: "Mobile" },
-];
-
-const PERIOD_OPTIONS: { value: PeriodPreset; label: string }[] = [
-  { value: "7", label: "7 hari" },
-  { value: "30", label: "30 hari" },
-  { value: "90", label: "90 hari" },
 ];
 
 type MapToolbarProps = {
@@ -41,14 +35,7 @@ function MapToolbar({ api, path, device }: MapToolbarProps) {
         </select>
       </label>
       <Segmented label="Perangkat" value={device} options={DEVICE_OPTIONS} onChange={(value) => api.setFilter("device", value)} />
-      <Segmented
-        label="Rentang waktu"
-        value={api.query.period.preset}
-        options={PERIOD_OPTIONS}
-        onChange={(value) => {
-          if (value !== "custom") api.setPreset(value);
-        }}
-      />
+      <PeriodControl period={api.query.period} onPreset={api.setPreset} onCustom={api.setCustomPeriod} />
     </section>
   );
 }

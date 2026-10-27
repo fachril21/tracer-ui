@@ -49,7 +49,8 @@ function FilterBar({ projectId, api, sessionsHref, canCompare = false }: FilterB
   return (
     <section aria-label="Filter dan rentang" className="flex flex-col gap-3">
       <PeriodControl
-        query={query}
+        period={query.period}
+        compare={query.compare}
         onPreset={api.setPreset}
         onCustom={api.setCustomPeriod}
         onCompare={canCompare ? api.setCompare : undefined}

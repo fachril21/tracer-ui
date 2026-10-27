@@ -6,6 +6,7 @@ import { Istilah } from "@/components/ui/istilah";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatCount, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { addDays, startOfDay } from "@/lib/dashboard-query";
 import { computeFunnel, stepLabel } from "@/mock/funnels";
 import { useActiveProject } from "@/state/use-active-project";
 import { useFunnels } from "@/state/use-funnels";
@@ -16,6 +17,10 @@ function FunnelPage() {
   const { project } = useActiveProject();
   const { funnels } = useFunnels(project?.id ?? "");
   const now = useMemo(() => new Date(), []);
+  const range = useMemo(() => {
+    const today = startOfDay(now);
+    return { from: addDays(today, -(LIST_DAYS - 1)), to: today };
+  }, [now]);
 
   if (project === null) return null;
 
@@ -49,7 +54,7 @@ function FunnelPage() {
       ) : (
         <ul aria-label="Daftar funnel" className="rounded-lg border border-hairline bg-canvas">
           {funnels.map((funnel) => {
-            const result = computeFunnel(project.id, funnel, LIST_DAYS, now);
+            const result = computeFunnel(project.id, funnel, range, now);
             const last = result.steps[result.steps.length - 1];
             return (
               <li key={funnel.id} className="border-b border-hairline last:border-b-0">

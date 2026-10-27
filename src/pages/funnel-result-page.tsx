@@ -6,31 +6,23 @@ import { FunnelSteps } from "@/components/funnel/funnel-steps";
 import type { SeriesBar } from "@/components/funnel/funnel-steps";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
+import { PeriodControl } from "@/components/filters/period-control";
 import { Segmented } from "@/components/ui/segmented";
 import type { SegmentedOption } from "@/components/ui/segmented";
 import { useDemo } from "@/state/demo-context";
+import { describePeriod, resolvePeriod, startOfDay, toIsoDate } from "@/lib/dashboard-query";
 import { cn } from "@/lib/utils";
 import { computeFunnel } from "@/mock/funnels";
-import type { FunnelPeriod } from "@/mock/funnels";
+import type { PeriodPreset } from "@/mock/types";
 import { useActiveProject } from "@/state/use-active-project";
 import { useFunnels } from "@/state/use-funnels";
 
 type Compare = "semua" | "perangkat";
 
-const PERIODS: { value: string; label: string }[] = [
-  { value: "7", label: "7 hari" },
-  { value: "30", label: "30 hari" },
-  { value: "90", label: "90 hari" },
-];
-
 const COMPARE_OPTIONS: SegmentedOption<Compare>[] = [
   { value: "semua", label: "Semua perangkat" },
   { value: "perangkat", label: "Bandingkan ponsel dan desktop", term: "bandingkanPerangkat" },
 ];
-
-function parsePeriod(raw: string | null): FunnelPeriod {
-  return raw === "7" ? 7 : raw === "90" ? 90 : 30;
-}
 
 function FunnelResultPage() {
   const { funnelId } = useParams();
@@ -43,19 +35,19 @@ function FunnelResultPage() {
   const now = useMemo(() => new Date(), []);
 
   const funnel = funnels.find((item) => item.id === funnelId);
-  const days = parsePeriod(params.get("hari"));
+  const period = useMemo(() => resolvePeriod(params, startOfDay(now), "30"), [params, now]);
   const compare: Compare = params.get("bandingkan") === "perangkat" ? "perangkat" : "semua";
 
   const series = useMemo<SeriesBar[]>(() => {
     if (project === null || funnel === undefined) return [];
     if (compare === "perangkat") {
       return [
-        { name: "Ponsel", result: computeFunnel(project.id, funnel, days, now, "Mobile") },
-        { name: "Desktop", result: computeFunnel(project.id, funnel, days, now, "Desktop") },
+        { name: "Ponsel", result: computeFunnel(project.id, funnel, period, now, "Mobile") },
+        { name: "Desktop", result: computeFunnel(project.id, funnel, period, now, "Desktop") },
       ];
     }
-    return [{ name: "Semua", result: computeFunnel(project.id, funnel, days, now) }];
-  }, [project, funnel, days, compare, now]);
+    return [{ name: "Semua", result: computeFunnel(project.id, funnel, period, now) }];
+  }, [project, funnel, period, compare, now]);
 
   if (project === null) return null;
   if (funnel === undefined) return <Navigate to={`/p/${project.id}/funnel`} replace />;
@@ -64,6 +56,23 @@ function FunnelResultPage() {
     const next = new URLSearchParams(params);
     if (value === fallback) next.delete(key);
     else next.set(key, value);
+    setParams(next, { replace: true });
+  };
+
+  const setPreset = (preset: Exclude<PeriodPreset, "custom">) => {
+    const next = new URLSearchParams(params);
+    next.delete("from");
+    next.delete("to");
+    if (preset === "30") next.delete("range");
+    else next.set("range", preset);
+    setParams(next, { replace: true });
+  };
+
+  const setCustom = (from: Date, to: Date) => {
+    const next = new URLSearchParams(params);
+    next.delete("range");
+    next.set("from", toIsoDate(from));
+    next.set("to", toIsoDate(to));
     setParams(next, { replace: true });
   };
 
@@ -121,12 +130,7 @@ function FunnelResultPage() {
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Segmented
-          label="Rentang waktu"
-          value={String(days)}
-          options={PERIODS}
-          onChange={(value) => setParam("hari", value, "30")}
-        />
+        <PeriodControl period={period} onPreset={setPreset} onCustom={setCustom} />
         <Segmented
           label="Perangkat"
           value={compare}
@@ -135,11 +139,11 @@ function FunnelResultPage() {
         />
       </div>
 
-      <Panel title="Langkah" meta={`${days} hari terakhir`}>
+      <Panel title="Langkah" meta={describePeriod(period)}>
         {series[0]?.result.steps[0]?.count === 0 ? (
           <p className="text-body text-mute">Belum ada sesi yang masuk di langkah pertama pada rentang ini.</p>
         ) : (
-          <FunnelSteps projectId={project.id} funnel={funnel} days={days} now={now} series={series} />
+          <FunnelSteps projectId={project.id} funnel={funnel} range={period} now={now} series={series} />
         )}
       </Panel>
     </div>

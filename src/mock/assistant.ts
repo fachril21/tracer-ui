@@ -1,3 +1,4 @@
+import { addDays, startOfDay } from "@/lib/dashboard-query";
 import { buildFeedback, summarizeFeedback } from "./feedback";
 import { EVENT_LABEL, computeFunnel, droppedSessions, seedFunnels, stepLabel } from "./funnels";
 import { buildSessionPool } from "./sessions";
@@ -63,16 +64,18 @@ function answerSession(projectId: string, session: MockSession): Answer {
 }
 
 function answerFunnel(projectId: string, funnel: Funnel, now: Date): Answer {
-  const all = computeFunnel(projectId, funnel, FUNNEL_DAYS, now);
+  const today = startOfDay(now);
+  const range = { from: addDays(today, -(FUNNEL_DAYS - 1)), to: today };
+  const all = computeFunnel(projectId, funnel, range, now);
   const index = all.biggestDropIndex;
   const step = index === null ? undefined : all.steps[index];
   if (index === null || step === undefined) {
     return { paragraphs: ["Funnel ini belum punya cukup langkah untuk dibandingkan."], sources: [], action: null };
   }
-  const mobile = computeFunnel(projectId, funnel, FUNNEL_DAYS, now, "Mobile").steps[index];
-  const desktop = computeFunnel(projectId, funnel, FUNNEL_DAYS, now, "Desktop").steps[index];
+  const mobile = computeFunnel(projectId, funnel, range, now, "Mobile").steps[index];
+  const desktop = computeFunnel(projectId, funnel, range, now, "Desktop").steps[index];
   const lost = 100 - step.rateFromPrevious;
-  const samples = droppedSessions(projectId, funnel, index, FUNNEL_DAYS, now).slice(0, 2);
+  const samples = droppedSessions(projectId, funnel, index, range, now).slice(0, 2);
   const base = `/p/${projectId}/funnel/${funnel.id}`;
 
   const paragraphs = [
@@ -86,7 +89,7 @@ function answerFunnel(projectId: string, funnel: Funnel, now: Date): Answer {
   return {
     paragraphs,
     sources: [
-      { label: `Funnel ${FUNNEL_DAYS} hari`, to: `${base}?hari=${FUNNEL_DAYS}` },
+      { label: `Funnel ${FUNNEL_DAYS} hari`, to: `${base}?range=${FUNNEL_DAYS}` },
       ...samples.map((session) => ({ label: `Sesi ${session.id}`, to: `/p/${projectId}/sessions/${session.id}` })),
     ],
     action: { label: "Bandingkan ponsel dan desktop", to: `${base}?bandingkan=perangkat` },

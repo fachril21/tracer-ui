@@ -13,7 +13,7 @@ import {
   toIsoDate,
 } from "@/lib/dashboard-query";
 import { cn } from "@/lib/utils";
-import type { DashboardQuery, PeriodPreset } from "@/mock/types";
+import type { Period, PeriodPreset } from "@/mock/types";
 
 const PRESET_OPTIONS: { value: PeriodPreset; label: string }[] = [
   { value: "7", label: "7 hari" },
@@ -90,16 +90,16 @@ function CustomRangeForm({ initialFrom, initialTo, onApply }: CustomRangeFormPro
 }
 
 type PeriodControlProps = {
-  query: DashboardQuery;
+  period: Period;
+  compare?: boolean;
   onPreset: (preset: Exclude<PeriodPreset, "custom">) => void;
   onCustom: (from: Date, to: Date) => void;
   // Tanpa ini tombol banding disembunyikan, misalnya di daftar sesi yang tidak punya pembanding
   onCompare?: (value: boolean) => void;
 };
 
-function PeriodControl({ query, onPreset, onCustom, onCompare }: PeriodControlProps) {
+function PeriodControl({ period, compare = false, onPreset, onCustom, onCompare }: PeriodControlProps) {
   const [isCustomOpen, setCustomOpen] = useState(false);
-  const { period, compare } = query;
   const isCustom = period.preset === "custom";
 
   return (

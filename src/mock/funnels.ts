@@ -13,7 +13,8 @@ type Funnel = {
   steps: FunnelStep[];
 };
 
-type FunnelPeriod = 7 | 30 | 90;
+// Rentang tanggal inklusif, sama dengan yang dipakai filter di halaman lain
+type FunnelRange = { from: Date; to: Date };
 
 type StepResult = {
   step: FunnelStep;
@@ -39,7 +40,6 @@ const EVENT_LABEL: Record<SmartEventKind, string> = {
 
 const MIN_STEPS = 2;
 const MAX_STEPS = 6;
-const MINUTES_PER_DAY = 1440;
 const DROPPED_SAMPLE = 5;
 
 function stepLabel(step: FunnelStep): string {
@@ -71,9 +71,13 @@ function seedFunnels(): Funnel[] {
 }
 
 // Sesi dalam rentang, dipakai sebagai populasi awal funnel
-function poolInPeriod(projectId: string, days: FunnelPeriod, now: Date): MockSession[] {
-  const start = now.getTime() - days * MINUTES_PER_DAY * 60000;
-  return buildSessionPool(projectId, now).filter((session) => session.startedAt.getTime() >= start);
+function poolInPeriod(projectId: string, range: FunnelRange, now: Date): MockSession[] {
+  const start = new Date(range.from.getFullYear(), range.from.getMonth(), range.from.getDate()).getTime();
+  const end = new Date(range.to.getFullYear(), range.to.getMonth(), range.to.getDate() + 1).getTime();
+  return buildSessionPool(projectId, now).filter((session) => {
+    const time = session.startedAt.getTime();
+    return time >= start && time < end;
+  });
 }
 
 // Peluang lolos tiap langkah: stabil per funnel dan langkah, lebih rendah di ponsel
@@ -87,11 +91,11 @@ function passRate(funnelId: string, step: FunnelStep, index: number, device: Moc
 function computeFunnel(
   projectId: string,
   funnel: Funnel,
-  days: FunnelPeriod,
+  range: FunnelRange,
   now: Date,
   device: MockSession["device"] | null = null,
 ): FunnelResult {
-  const pool = poolInPeriod(projectId, days, now).filter((session) => device === null || session.device === device);
+  const pool = poolInPeriod(projectId, range, now).filter((session) => device === null || session.device === device);
   const first = funnel.steps[0];
   if (first === undefined) return { steps: [], biggestDropIndex: null };
 
@@ -125,10 +129,10 @@ function droppedSessions(
   projectId: string,
   funnel: Funnel,
   stepIndex: number,
-  days: FunnelPeriod,
+  range: FunnelRange,
   now: Date,
 ): MockSession[] {
-  const pool = poolInPeriod(projectId, days, now);
+  const pool = poolInPeriod(projectId, range, now);
   const offset = hashText(`${funnel.id}:${funnel.steps[stepIndex]?.id ?? ""}`) % Math.max(1, pool.length);
   return Array.from({ length: Math.min(DROPPED_SAMPLE, pool.length) }, (_, index) => pool[(offset + index * 7) % pool.length]!)
     .filter((session, index, all) => all.findIndex((other) => other.id === session.id) === index)
@@ -145,4 +149,4 @@ export {
   seedFunnels,
   stepLabel,
 };
-export type { Funnel, FunnelPeriod, FunnelResult, FunnelStep, StepResult };
+export type { Funnel, FunnelRange, FunnelResult, FunnelStep, StepResult };

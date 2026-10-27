@@ -9,21 +9,21 @@ import { GLOSSARY } from "@/lib/glossary";
 import { formatCount, formatDuration, formatPercent, formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { droppedSessions, stepLabel } from "@/mock/funnels";
-import type { Funnel, FunnelPeriod, FunnelResult } from "@/mock/funnels";
+import type { Funnel, FunnelRange, FunnelResult } from "@/mock/funnels";
 
 type SeriesBar = { name: string; result: FunnelResult };
 
 type FunnelStepsProps = {
   projectId: string;
   funnel: Funnel;
-  days: FunnelPeriod;
+  range: FunnelRange;
   now: Date;
   // Satu seri untuk tampilan biasa, dua untuk perbandingan perangkat
   series: SeriesBar[];
 };
 
-function DroppedList({ projectId, funnel, stepIndex, days, now }: Omit<FunnelStepsProps, "series"> & { stepIndex: number }) {
-  const sessions = droppedSessions(projectId, funnel, stepIndex, days, now);
+function DroppedList({ projectId, funnel, stepIndex, range, now }: Omit<FunnelStepsProps, "series"> & { stepIndex: number }) {
+  const sessions = droppedSessions(projectId, funnel, stepIndex, range, now);
   return (
     <ul aria-label="Contoh sesi yang berhenti" className="flex flex-col border-t border-hairline">
       {sessions.map((session) => (
@@ -43,7 +43,7 @@ function DroppedList({ projectId, funnel, stepIndex, days, now }: Omit<FunnelSte
   );
 }
 
-function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps) {
+function FunnelSteps({ projectId, funnel, range, now, series }: FunnelStepsProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const primary = series[0]?.result;
   if (primary === undefined) return null;
@@ -128,7 +128,7 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
               ) : null}
             </div>
             {isOpen ? (
-              <DroppedList projectId={projectId} funnel={funnel} stepIndex={index} days={days} now={now} />
+              <DroppedList projectId={projectId} funnel={funnel} stepIndex={index} range={range} now={now} />
             ) : null}
           </li>
         );

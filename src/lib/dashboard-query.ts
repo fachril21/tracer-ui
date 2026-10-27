@@ -40,7 +40,11 @@ function presetPeriod(preset: Exclude<PeriodPreset, "custom">, today: Date): Per
   return { preset, from: addDays(today, -(days - 1)), to: today, days };
 }
 
-function resolvePeriod(params: URLSearchParams, today: Date): Period {
+function resolvePeriod(
+  params: URLSearchParams,
+  today: Date,
+  fallback: Exclude<PeriodPreset, "custom"> = "7",
+): Period {
   const from = parseIsoDate(params.get("from"));
   const to = parseIsoDate(params.get("to"));
   if (from !== null && to !== null) {
@@ -50,8 +54,8 @@ function resolvePeriod(params: URLSearchParams, today: Date): Period {
     if (isInBounds) return { preset: "custom", from, to, days };
   }
   const range = params.get("range");
-  if (range === "30" || range === "90") return presetPeriod(range, today);
-  return presetPeriod("7", today);
+  if (range === "7" || range === "30" || range === "90") return presetPeriod(range, today);
+  return presetPeriod(fallback, today);
 }
 
 function resolveFilters(params: URLSearchParams): DashboardFilters {
@@ -124,6 +128,8 @@ export {
   earliestDate,
   parseIsoDate,
   parseQuery,
+  presetPeriod,
+  resolvePeriod,
   previousPeriod,
   serializeQuery,
   startOfDay,
