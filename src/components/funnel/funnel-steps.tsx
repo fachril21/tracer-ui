@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, TriangleAlert } from "lucide-react";
 import { Link } from "react-router";
+import { FunnelFlow } from "@/components/funnel/funnel-flow";
 import { Istilah } from "@/components/ui/istilah";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -49,7 +50,8 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
 
   return (
     <>
-    <div className="flex justify-end gap-3 px-3 pb-1 text-caption text-mute">
+    <FunnelFlow series={series} />
+    <div className="mt-4 flex justify-end gap-3 px-3 pb-1 text-caption text-mute">
       <span className="w-14 text-right">Sesi</span>
       <Istilah term="persenFunnel" className="w-14 text-right">
         % awal
@@ -61,8 +63,8 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
         const isOpen = openIndex === index;
         return (
           <li key={first.step.id} className="border-b border-hairline last:border-b-0">
-            <div className="flex flex-col gap-2 px-3 py-3">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="relative flex flex-col gap-2 px-3 py-3">
+              <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-1", series.length === 1 && "pr-32")}>
                 <span
                   aria-hidden="true"
                   className="flex size-5 shrink-0 items-center justify-center bg-ink font-mono text-caption text-paper"
@@ -90,16 +92,11 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
                 const result = item.result.steps[index];
                 if (result === undefined) return null;
                 return (
-                  <div key={item.name} className="flex items-center gap-3">
+                  <div key={item.name} className={cn("flex items-center gap-3", series.length === 1 && "absolute right-3 top-3")}>
                     {series.length > 1 ? (
                       <span className="w-16 shrink-0 text-caption text-mute">{item.name}</span>
                     ) : null}
-                    <span className="h-3 flex-1 bg-surface-soft" aria-hidden="true">
-                      <span
-                        className={cn("block h-full", isBiggest ? "bg-warning-solid" : "bg-primary")}
-                        style={{ width: `${Math.max(result.rateFromStart, result.count > 0 ? 1 : 0)}%` }}
-                      />
-                    </span>
+                    {series.length > 1 ? <span className="flex-1" aria-hidden="true" /> : null}
                     <span className="w-14 shrink-0 text-right font-mono text-caption tabular-nums text-ink">
                       {formatCount(result.count)}
                     </span>
