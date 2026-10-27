@@ -7,6 +7,7 @@ import { ReplayControls } from "@/components/replay/replay-controls";
 import { ReplayStage } from "@/components/replay/replay-stage";
 import { SessionInfoPanel } from "@/components/replay/session-info-panel";
 import { buttonVariants } from "@/components/ui/button";
+import { Istilah } from "@/components/ui/istilah";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { usePlayback } from "@/hooks/use-playback";
 import { formatClock, formatDateTime } from "@/lib/format";
@@ -51,7 +52,10 @@ function IntegrityNote({ session, gapAt }: { session: MockSession; gapAt: number
         className="flex items-start gap-2 rounded-lg border border-hairline bg-warning-bg p-3 text-body text-warning-text"
       >
         <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-        {`Rekaman sesi ini punya celah${gapAt === null ? "" : ` sekitar menit ${formatClock(gapAt)}`}. Bagian itu tidak bisa diputar.`}
+        <span>
+          Rekaman sesi ini punya <Istilah term="kelengkapan">celah</Istilah>
+          {gapAt === null ? "" : ` sekitar menit ${formatClock(gapAt)}`}. Bagian itu tidak bisa diputar.
+        </span>
       </p>
     );
   }
@@ -62,7 +66,10 @@ function IntegrityNote({ session, gapAt }: { session: MockSession; gapAt: number
         className="flex items-start gap-2 rounded-lg border border-hairline bg-surface-soft p-3 text-body text-charcoal"
       >
         <CircleHelp className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-        Kelengkapan rekaman belum bisa dipastikan. Sesi ini mungkin terputus sebelum selesai dikirim.
+        <span>
+          <Istilah term="kelengkapan">Kelengkapan rekaman</Istilah> belum bisa dipastikan. Sesi ini mungkin terputus
+          sebelum selesai dikirim.
+        </span>
       </p>
     );
   }

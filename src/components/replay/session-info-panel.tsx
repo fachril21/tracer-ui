@@ -1,23 +1,26 @@
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 import { CircleCheck, Info, Radio } from "lucide-react";
+import { Istilah } from "@/components/ui/istilah";
 import { Panel } from "@/components/ui/panel";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatCount, formatDateTime, formatDuration } from "@/lib/format";
+import type { GlossaryKey } from "@/lib/glossary";
 import { buildSessionInfo } from "@/mock/session-info";
 import type { MockSession } from "@/mock/types";
 
 type FieldProps = {
   label: string;
+  term?: GlossaryKey;
   children: ReactNode;
   isMono?: boolean;
   isMuted?: boolean;
 };
 
-function Field({ label, children, isMono = false, isMuted = false }: FieldProps) {
+function Field({ label, term, children, isMono = false, isMuted = false }: FieldProps) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
-      <dt className="text-caption text-mute">{label}</dt>
+      <dt className="text-caption text-mute">{term === undefined ? label : <Istilah term={term}>{label}</Istilah>}</dt>
       <dd className={`break-words text-body ${isMuted ? "text-mute" : "text-ink"} ${isMono ? "font-mono text-mono" : ""}`}>
         {children}
       </dd>
@@ -35,23 +38,23 @@ function SessionInfoPanel({ session }: { session: MockSession }) {
   const info = useMemo(() => buildSessionInfo(session, new Date()), [session]);
 
   return (
-    <Panel title="Informasi sesi" meta="Zona waktu: Asia/Jakarta">
+    <Panel title="Informasi sesi" meta={<Istilah term="zonaWaktu">Zona waktu: Asia/Jakarta</Istilah>}>
       <dl className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Mulai">{formatDateTime(info.startedAt)}</Field>
-        <Field label="Aktif terakhir">{formatDateTime(info.lastActiveAt)}</Field>
-        <Field label="Selesai" isMuted={info.endedAt === null}>
+        <Field label="Aktif terakhir" term="aktifTerakhir">{formatDateTime(info.lastActiveAt)}</Field>
+        <Field label="Selesai" term="selesai" isMuted={info.endedAt === null}>
           {info.endedAt === null ? "Masih berlangsung" : formatDateTime(info.endedAt)}
         </Field>
 
         <Field label="Durasi">{formatDuration(info.durationSeconds)}</Field>
-        <Field label="Jumlah chunk">{formatCount(info.chunkCount)}</Field>
-        <Field label="Ukuran">{formatSize(info.sizeKb)}</Field>
+        <Field label="Jumlah chunk" term="chunk">{formatCount(info.chunkCount)}</Field>
+        <Field label="Ukuran" term="ukuran">{formatSize(info.sizeKb)}</Field>
 
-        <Field label="Halaman awal" isMono>
+        <Field label="Halaman awal" term="halamanAwal" isMono>
           {session.entryPage}
         </Field>
-        <Field label="Smart Events">{formatCount(info.smartEventTotal)}</Field>
-        <Field label="Skor Masalah">{formatCount(session.problemScore)}</Field>
+        <Field label="Smart Events" term="smartEvents">{formatCount(info.smartEventTotal)}</Field>
+        <Field label="Skor Masalah" term="skorMasalah">{formatCount(session.problemScore)}</Field>
 
         <div className="flex flex-col gap-1">
           <dt className="text-caption text-mute">Status</dt>
@@ -76,7 +79,7 @@ function SessionInfoPanel({ session }: { session: MockSession }) {
       </dl>
 
       <dl>
-        <Field label="User agent" isMono>
+        <Field label="User agent" term="userAgent" isMono>
           {info.userAgent}
         </Field>
       </dl>

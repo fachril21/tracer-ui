@@ -15,6 +15,7 @@ import { PopularPages } from "@/components/overview/popular-pages";
 import { SessionsChart } from "@/components/overview/sessions-chart";
 import { StatCard } from "@/components/overview/stat-card";
 import { Button } from "@/components/ui/button";
+import { Istilah } from "@/components/ui/istilah";
 import { Panel } from "@/components/ui/panel";
 import { useDashboardQuery } from "@/hooks/use-dashboard-query";
 import type { DashboardQueryApi } from "@/hooks/use-dashboard-query";
@@ -85,12 +86,12 @@ function OverviewContent({ data, project, api, now }: OverviewContentProps) {
         </Panel>
 
         <div className="flex flex-col gap-4 xl:col-span-4">
-          <Panel title="Smart events" meta={formatCount(totalEvents)}>
+          <Panel title="Smart events" term="smartEvents" meta={formatCount(totalEvents)}>
             <BreakdownList
               rows={countRows([
-                { id: "dead_click", label: "Dead click", count: data.smartEventTotals.dead_click, tone: "warning" },
-                { id: "rage_click", label: "Rage click", count: data.smartEventTotals.rage_click, tone: "warning" },
-                { id: "js_error", label: "Error JS", count: data.smartEventTotals.js_error, tone: "danger" },
+                { id: "dead_click", label: "Dead click", count: data.smartEventTotals.dead_click, tone: "warning", term: "deadClick" },
+                { id: "rage_click", label: "Rage click", count: data.smartEventTotals.rage_click, tone: "warning", term: "rageClick" },
+                { id: "js_error", label: "Error JS", count: data.smartEventTotals.js_error, tone: "danger", term: "errorJs" },
               ])}
               selectedId={query.filters.signal}
               selectLabel="Saring berdasarkan sinyal"
@@ -102,7 +103,7 @@ function OverviewContent({ data, project, api, now }: OverviewContentProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <Panel title="Sesi yang perlu dilihat" meta="skor masalah tertinggi" className="xl:col-span-7">
+        <Panel title="Sesi yang perlu dilihat" term="sesiPerluDilihat" meta={<Istilah term="skorMasalah">skor masalah tertinggi</Istilah>} className="xl:col-span-7">
           {data.topSessions.length === 0 ? (
             <p className="py-6 text-center text-body text-mute">
               Tidak ada sesi bermasalah pada rentang dan filter ini.
@@ -111,7 +112,7 @@ function OverviewContent({ data, project, api, now }: OverviewContentProps) {
             <AttentionSessions sessions={data.topSessions} projectId={project.id} now={now} />
           )}
         </Panel>
-        <Panel title="Halaman populer" meta={periodText} className="xl:col-span-5">
+        <Panel title="Halaman populer" term="halamanPopuler" meta={periodText} className="xl:col-span-5">
           <PopularPages
             pages={data.popularPages}
             projectId={project.id}

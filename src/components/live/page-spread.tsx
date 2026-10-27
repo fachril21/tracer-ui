@@ -16,7 +16,7 @@ function PageSpread({ visitors }: PageSpreadProps) {
   const busiest = Math.max(...rows.map((row) => row.here.length), 0);
 
   return (
-    <Panel title="Sebaran halaman" meta={`${active.length} aktif`}>
+    <Panel title="Sebaran halaman" term="sebaranHalaman" meta={`${active.length} aktif`}>
       <ul className="flex flex-col gap-3">
         {rows.map(({ path, here }) => {
           const shown = here.slice(0, MAX_NODES);

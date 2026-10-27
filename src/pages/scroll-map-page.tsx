@@ -2,7 +2,11 @@ import { useMemo } from "react";
 import { MapStage } from "@/components/maps/map-stage";
 import { HeatLegend, QualityPanel, QualityStrip } from "@/components/maps/map-parts";
 import { MapToolbar } from "@/components/maps/map-toolbar";
+import { Istilah } from "@/components/ui/istilah";
 import { Panel } from "@/components/ui/panel";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { GLOSSARY } from "@/lib/glossary";
+import type { GlossaryKey } from "@/lib/glossary";
 import { useDashboardQuery } from "@/hooks/use-dashboard-query";
 import { formatCount } from "@/lib/format";
 import { isLightMagma, magmaCss } from "@/lib/magma";
@@ -33,10 +37,12 @@ function BandOverlay({ band }: { band: ScrollBand }) {
   );
 }
 
-function StatTile({ label, value, hint }: { label: string; value: string; hint: string }) {
+function StatTile({ label, term, value, hint }: { label: string; term: GlossaryKey; value: string; hint: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="font-mono text-label uppercase tracking-[0.06em] text-stone">{label}</dt>
+      <dt className="font-mono text-label uppercase tracking-[0.06em] text-stone">
+        <Istilah term={term}>{label}</Istilah>
+      </dt>
       <dd className="font-mono text-heading-md font-medium tabular-nums text-ink">{value}</dd>
       <dd className="text-caption text-mute">{hint}</dd>
     </div>
@@ -47,13 +53,20 @@ function DepthMarkers({ data }: { data: ScrollMapData }) {
   return (
     <>
       <div
-        aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 border-t-2 border-dashed border-ink"
         style={{ top: `${data.fold * 100}%` }}
       >
-        <span className="absolute right-8 -top-5 whitespace-nowrap rounded-xs bg-ink px-1.5 py-0.5 font-mono text-label text-paper">
-          Layar pertama
-        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              className="pointer-events-auto absolute right-8 -top-5 cursor-help whitespace-nowrap rounded-xs bg-ink px-1.5 py-0.5 font-mono text-label text-paper"
+            >
+              Layar pertama
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-64 px-2.5 py-1.5 leading-snug">{GLOSSARY.layarPertama}</TooltipContent>
+        </Tooltip>
       </div>
       <div
         aria-hidden="true"
@@ -146,12 +159,12 @@ function ScrollMapBody({ projectId }: { projectId: string }) {
           <QualityPanel quality={data.quality} />
           <Panel title="Ringkasan kedalaman">
             <dl className="grid grid-cols-1 gap-4">
-              <StatTile label="Rata-rata kedalaman" value={`${data.avgDepth}%`} hint="Seberapa jauh pengunjung rata-rata menggulir" />
-              <StatTile label="Sampai setengah" value={`${data.reach50}%`} hint="Sesi yang mencapai 50% halaman" />
-              <StatTile label="Sampai akhir" value={`${data.reachEnd}%`} hint="Sesi yang mencapai pita terakhir" />
+              <StatTile label="Rata-rata kedalaman" term="rataKedalaman" value={`${data.avgDepth}%`} hint="Seberapa jauh pengunjung rata-rata menggulir" />
+              <StatTile label="Sampai setengah" term="sampaiSetengah" value={`${data.reach50}%`} hint="Sesi yang mencapai 50% halaman" />
+              <StatTile label="Sampai akhir" term="sampaiAkhir" value={`${data.reachEnd}%`} hint="Sesi yang mencapai pita terakhir" />
             </dl>
           </Panel>
-          <Panel title="Bagian paling sering dilihat" meta="porsi waktu">
+          <Panel title="Bagian paling sering dilihat" term="bagianDilihat" meta="porsi waktu">
             <ol className="flex flex-col gap-3">
               {data.topSections.map((section, index) => (
                 <li key={section.id} className="flex flex-col gap-1.5">

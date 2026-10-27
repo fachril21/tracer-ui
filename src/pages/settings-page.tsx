@@ -7,6 +7,8 @@ import { MembersEditor } from "@/components/project/members-editor";
 import { OriginEditor } from "@/components/project/origin-editor";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/input";
+import { Istilah } from "@/components/ui/istilah";
+import type { GlossaryKey } from "@/lib/glossary";
 import { useAuth } from "@/state/auth-context";
 import { useDemo } from "@/state/demo-context";
 import { useActiveProject } from "@/state/use-active-project";
@@ -23,13 +25,14 @@ const SECTIONS = [
 type SectionProps = {
   id: (typeof SECTIONS)[number]["id"];
   title: string;
+  term?: GlossaryKey;
   description: string;
   children: ReactNode;
   isDanger?: boolean;
 };
 
 // Setiap bagian punya judul dan penjelasan di kiri atas, isi di bawahnya. Zona bahaya diberi penanda sendiri.
-function Section({ id, title, description, children, isDanger = false }: SectionProps) {
+function Section({ id, title, term, description, children, isDanger = false }: SectionProps) {
   return (
     <section
       id={id}
@@ -46,7 +49,7 @@ function Section({ id, title, description, children, isDanger = false }: Section
           className={isDanger ? "flex items-center gap-2 text-heading-md font-semibold text-danger-text" : "text-heading-md font-semibold text-ink"}
         >
           {isDanger ? <TriangleAlert className="size-4" aria-hidden="true" /> : null}
-          {title}
+          {term === undefined ? title : <Istilah term={term}>{title}</Istilah>}
         </h2>
         <p className="max-w-prose text-body text-mute">{description}</p>
       </header>
@@ -153,6 +156,7 @@ function SettingsPage() {
           <Section
             id="origin-sesi"
             title="Origin sesi"
+            term="originSesi"
             description="Website yang boleh memulai sesi. Sesi dari origin lain ditolak."
           >
             <OriginEditor
@@ -167,6 +171,7 @@ function SettingsPage() {
           <Section
             id="origin-gambar"
             title="Origin gambar"
+            term="originGambar"
             description="Domain aset gambar yang boleh dimuat saat rekaman diputar ulang, misalnya CDN website."
           >
             <OriginEditor

@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router";
 import { AccountMenu } from "@/components/shell/account-menu";
 import { ThemeToggle } from "@/components/shell/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { Istilah } from "@/components/ui/istilah";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAssistant } from "@/state/assistant-context";
@@ -102,9 +103,11 @@ function Topbar({ onOpenDrawer }: TopbarProps) {
           <StatusBadge kind="success" icon={CircleCheck} className="sm:hidden">
             Terpasang
           </StatusBadge>
-          <StatusBadge kind="success" icon={CircleCheck} className="hidden sm:inline-flex">
-            Pemasangan terdeteksi
-          </StatusBadge>
+          <Istilah term="terdeteksi" className="hidden sm:inline-flex">
+            <StatusBadge kind="success" icon={CircleCheck}>
+              Pemasangan terdeteksi
+            </StatusBadge>
+          </Istilah>
         </>
       ) : (
         <>

@@ -7,6 +7,7 @@ import type { SeriesBar } from "@/components/funnel/funnel-steps";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { Segmented } from "@/components/ui/segmented";
+import type { SegmentedOption } from "@/components/ui/segmented";
 import { useDemo } from "@/state/demo-context";
 import { cn } from "@/lib/utils";
 import { computeFunnel } from "@/mock/funnels";
@@ -22,9 +23,9 @@ const PERIODS: { value: string; label: string }[] = [
   { value: "90", label: "90 hari" },
 ];
 
-const COMPARE_OPTIONS: { value: Compare; label: string }[] = [
+const COMPARE_OPTIONS: SegmentedOption<Compare>[] = [
   { value: "semua", label: "Semua perangkat" },
-  { value: "perangkat", label: "Bandingkan ponsel dan desktop" },
+  { value: "perangkat", label: "Bandingkan ponsel dan desktop", term: "bandingkanPerangkat" },
 ];
 
 function parsePeriod(raw: string | null): FunnelPeriod {

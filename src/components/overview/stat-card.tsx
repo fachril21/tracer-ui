@@ -1,8 +1,19 @@
 import { ArrowDown, ArrowRight, ArrowUp, Minus } from "lucide-react";
 import { Link } from "react-router";
+import { Istilah } from "@/components/ui/istilah";
+import type { GlossaryKey } from "@/lib/glossary";
 import { formatCount, formatDuration, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { OverviewMetric } from "@/mock/types";
+
+const TERM_BY_ID: Record<string, GlossaryKey> = {
+  sessions: "sesi",
+  problems: "sesiBermasalah",
+  events: "smartEvents",
+  duration: "rataDurasi",
+  scroll: "kedalamanGulir",
+  active: "waktuAktif",
+};
 
 function formatValue(metric: OverviewMetric): string {
   if (metric.unit === "durasi") return formatDuration(metric.value);
@@ -43,10 +54,10 @@ function Delta({ metric, periodLabel }: { metric: OverviewMetric; periodLabel: s
       <span aria-hidden="true" className="font-mono tabular-nums">
         {magnitude}
       </span>
-      <span className="sr-only">{`${spoken} dibanding ${periodLabel} sebelumnya`}</span>
-      <span aria-hidden="true" className="text-mute">
+      <span className="sr-only">{spoken}</span>
+      <Istilah term="perubahan" className="text-mute">
         vs {periodLabel} lalu
-      </span>
+      </Istilah>
     </p>
   );
 }
@@ -59,35 +70,44 @@ type StatCardProps = {
 };
 
 function StatCard({ metric, periodLabel, href }: StatCardProps) {
-  const content = (
-    <>
-      <span className="flex items-center justify-between gap-2 text-caption text-mute">
-        {metric.label}
+  const term = TERM_BY_ID[metric.id];
+  const value = formatValue(metric);
+  const valueClass = "font-mono text-stat font-medium tabular-nums text-ink";
+
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col gap-2 rounded-lg border border-hairline bg-canvas p-5",
+        href !== undefined &&
+          "group transition-colors duration-[var(--motion-fast)] hover:border-border-control hover:bg-surface-hover",
+      )}
+    >
+      <span className="relative z-10 flex items-center justify-between gap-2 text-caption text-mute">
+        <span>{term === undefined ? metric.label : <Istilah term={term}>{metric.label}</Istilah>}</span>
         {href === undefined ? null : (
           <ArrowRight
-            className="size-3.5 -translate-x-1 text-stone opacity-0 transition-[opacity,transform] duration-[var(--motion-fast)] group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
+            className="size-3.5 -translate-x-1 text-stone opacity-0 transition-[opacity,transform] duration-[var(--motion-fast)] group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100"
             aria-hidden="true"
           />
         )}
       </span>
-      <span className="font-mono text-stat font-medium tabular-nums text-ink">{formatValue(metric)}</span>
-      <Delta metric={metric} periodLabel={periodLabel} />
-    </>
-  );
-  const base = "flex flex-col gap-2 rounded-lg border border-hairline bg-canvas p-5";
-
-  if (href === undefined) return <div className={base}>{content}</div>;
-  return (
-    <Link
-      to={href}
-      aria-label={`${metric.label}: ${formatValue(metric)}. Buka sesi yang mendasarinya`}
-      className={cn(
-        base,
-        "group transition-colors duration-[var(--motion-fast)] hover:border-border-control hover:bg-surface-hover",
+      {href === undefined ? (
+        <span className={valueClass}>{value}</span>
+      ) : (
+        <Link
+          to={href}
+          aria-label={`${metric.label}: ${value}. Buka sesi yang mendasarinya`}
+          className={cn(
+            "w-fit outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-primary",
+          )}
+        >
+          <span className={valueClass}>{value}</span>
+        </Link>
       )}
-    >
-      {content}
-    </Link>
+      <div className="relative z-10 w-fit">
+        <Delta metric={metric} periodLabel={periodLabel} />
+      </div>
+    </div>
   );
 }
 

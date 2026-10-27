@@ -1,6 +1,7 @@
 import type { KeyboardEvent } from "react";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Istilah } from "@/components/ui/istilah";
 import { Segmented } from "@/components/ui/segmented";
 import { SPEEDS } from "@/hooks/use-playback";
 import type { Playback, PlaybackSpeed } from "@/hooks/use-playback";
@@ -120,6 +121,9 @@ function ReplayControls({ replay, playback }: ReplayControlsProps) {
           >
             +{SKIP_SECONDS} d
           </Button>
+          <span className="text-caption text-mute">
+            <Istilah term="kecepatanPutar">Kecepatan</Istilah>
+          </span>
           <Segmented
             label="Kecepatan"
             value={`${speed}`}

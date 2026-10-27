@@ -1,5 +1,6 @@
 import { Check, Eye, Play, RotateCcw, Star } from "lucide-react";
 import { Link } from "react-router";
+import { Istilah } from "@/components/ui/istilah";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,10 @@ function FeedbackDetail({ item, projectId, onStatus }: FeedbackDetailProps) {
         <dd className="truncate font-mono text-ink">{item.page}</dd>
         <dt className="text-mute">Perangkat</dt>
         <dd className="text-ink">{item.device}</dd>
+        <dt className="text-mute">
+          <Istilah term="rekamanMenyertai">Rekaman</Istilah>
+        </dt>
+        <dd className="text-ink">{item.sessionId === null ? "Tidak ada" : "Tersedia"}</dd>
         <dt className="text-mute">Email</dt>
         <dd className="truncate text-ink">{item.email ?? "Tidak diisi"}</dd>
       </dl>

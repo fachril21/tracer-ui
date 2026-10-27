@@ -5,6 +5,7 @@ import { HeatLegend, QualityPanel, QualityStrip } from "@/components/maps/map-pa
 import { MapToolbar } from "@/components/maps/map-toolbar";
 import { Panel } from "@/components/ui/panel";
 import { Segmented } from "@/components/ui/segmented";
+import type { SegmentedOption } from "@/components/ui/segmented";
 import { useDashboardQuery } from "@/hooks/use-dashboard-query";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -15,10 +16,10 @@ import { useActiveProject } from "@/state/use-active-project";
 
 type Layer = "semua" | ClickKind;
 
-const LAYER_OPTIONS: { value: Layer; label: string }[] = [
+const LAYER_OPTIONS: SegmentedOption<Layer>[] = [
   { value: "semua", label: "Semua klik" },
-  { value: "rage", label: "Rage click" },
-  { value: "dead", label: "Dead click" },
+  { value: "rage", label: "Rage click", term: "rageClick" },
+  { value: "dead", label: "Dead click", term: "deadClick" },
 ];
 
 const ELEMENT_LIMIT = 8;
@@ -161,7 +162,7 @@ function ClickMapBody({ projectId }: { projectId: string }) {
 
         <div className="flex flex-col gap-4">
           <QualityPanel quality={data.quality} />
-          <Panel title="Elemen paling banyak diklik" meta={`${topElements.length} teratas`}>
+          <Panel title="Elemen paling banyak diklik" term="elemenDiklik" meta={`${topElements.length} teratas`}>
             <ol aria-label="Elemen paling banyak diklik" className="-mx-2 flex flex-col">
               {topElements.map((element, index) => (
                 <ElementRow

@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { TextField } from "@/components/ui/input";
 import { Panel } from "@/components/ui/panel";
 import { Segmented } from "@/components/ui/segmented";
+import type { SegmentedOption } from "@/components/ui/segmented";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { formatCount, formatRelative } from "@/lib/format";
@@ -20,25 +21,25 @@ import { useFeedback } from "@/state/use-feedback";
 type StatusFilter = "semua" | FeedbackStatus;
 type KindFilter = "semua" | FeedbackKind;
 
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+const STATUS_OPTIONS: SegmentedOption<StatusFilter>[] = [
   { value: "semua", label: "Semua" },
-  { value: "baru", label: STATUS_LABEL.baru },
-  { value: "dibaca", label: STATUS_LABEL.dibaca },
-  { value: "selesai", label: STATUS_LABEL.selesai },
+  { value: "baru", label: STATUS_LABEL.baru, term: "statusMasukan" },
+  { value: "dibaca", label: STATUS_LABEL.dibaca, term: "statusMasukan" },
+  { value: "selesai", label: STATUS_LABEL.selesai, term: "statusMasukan" },
 ];
 
-const KIND_OPTIONS: { value: KindFilter; label: string }[] = [
+const KIND_OPTIONS: SegmentedOption<KindFilter>[] = [
   { value: "semua", label: "Semua jenis" },
-  { value: "masalah", label: KIND_LABEL.masalah },
-  { value: "saran", label: KIND_LABEL.saran },
-  { value: "pujian", label: KIND_LABEL.pujian },
+  { value: "masalah", label: KIND_LABEL.masalah, term: "jenisMasukan" },
+  { value: "saran", label: KIND_LABEL.saran, term: "jenisMasukan" },
+  { value: "pujian", label: KIND_LABEL.pujian, term: "jenisMasukan" },
 ];
 
 function RatingSummary({ items }: { items: readonly FeedbackItem[] }) {
   const summary = summarizeFeedback(items);
   const peak = Math.max(1, ...summary.distribution);
   return (
-    <Panel title="Ringkasan nilai" meta={`${formatCount(summary.total)} masukan`}>
+    <Panel title="Ringkasan nilai" term="ringkasanNilai" meta={`${formatCount(summary.total)} masukan`}>
       <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
         <div className="flex flex-col gap-1">
           <p className="font-mono text-heading-lg tabular-nums text-ink">{summary.average.toFixed(1).replace(".", ",")}</p>

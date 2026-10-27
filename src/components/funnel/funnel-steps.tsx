@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { ChevronDown, TriangleAlert } from "lucide-react";
 import { Link } from "react-router";
+import { Istilah } from "@/components/ui/istilah";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { GLOSSARY } from "@/lib/glossary";
 import { formatCount, formatDuration, formatPercent, formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { droppedSessions, stepLabel } from "@/mock/funnels";
@@ -45,6 +48,13 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
   if (primary === undefined) return null;
 
   return (
+    <>
+    <div className="flex justify-end gap-3 px-3 pb-1 text-caption text-mute">
+      <span className="w-14 text-right">Sesi</span>
+      <Istilah term="persenFunnel" className="w-14 text-right">
+        % awal
+      </Istilah>
+    </div>
     <ol className="flex flex-col">
       {primary.steps.map((first, index) => {
         const isBiggest = primary.biggestDropIndex === index;
@@ -63,12 +73,16 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
                   {stepLabel(first.step)}
                 </span>
                 {first.step.kind === "event" ? (
-                  <span className="text-caption text-mute">kejadian cerdas</span>
+                  <Istilah term="langkah" className="text-caption text-mute">
+                    kejadian cerdas
+                  </Istilah>
                 ) : null}
                 {isBiggest ? (
-                  <StatusBadge kind="warning" icon={TriangleAlert}>
-                    Penurunan terbesar
-                  </StatusBadge>
+                  <Istilah term="penurunanTerbesar">
+                    <StatusBadge kind="warning" icon={TriangleAlert}>
+                      Penurunan terbesar
+                    </StatusBadge>
+                  </Istilah>
                 ) : null}
               </div>
 
@@ -97,6 +111,8 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
               })}
 
               {index > 0 && series.length === 1 ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : index)}
@@ -109,6 +125,9 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
                   />
                   <span className="font-mono tabular-nums">{formatCount(first.dropped)}</span> berhenti sebelum langkah ini
                 </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-64 px-2.5 py-1.5 leading-snug">{GLOSSARY.berhentiSebelum}</TooltipContent>
+                </Tooltip>
               ) : null}
             </div>
             {isOpen ? (
@@ -118,6 +137,7 @@ function FunnelSteps({ projectId, funnel, days, now, series }: FunnelStepsProps)
         );
       })}
     </ol>
+    </>
   );
 }
 

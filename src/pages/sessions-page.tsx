@@ -5,6 +5,7 @@ import { AttentionSessions } from "@/components/overview/attention-sessions";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Segmented } from "@/components/ui/segmented";
+import type { SegmentedOption } from "@/components/ui/segmented";
 import { useDashboardQuery } from "@/hooks/use-dashboard-query";
 import { describePeriod } from "@/lib/dashboard-query";
 import { formatCount } from "@/lib/format";
@@ -14,9 +15,9 @@ import { useActiveProject } from "@/state/use-active-project";
 
 type SortMode = "terbaru" | "skor";
 
-const SORT_OPTIONS: { value: SortMode; label: string }[] = [
+const SORT_OPTIONS: SegmentedOption<SortMode>[] = [
   { value: "terbaru", label: "Terbaru" },
-  { value: "skor", label: "Skor masalah" },
+  { value: "skor", label: "Skor masalah", term: "skorMasalah" },
 ];
 
 const PAGE_SIZE = 12;

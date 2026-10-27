@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { ArrowUpRight, LoaderCircle, RotateCcw, Send, Sparkles, Trash2, TriangleAlert, X } from "lucide-react";
 import { Link } from "react-router";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Istilah } from "@/components/ui/istilah";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
@@ -72,7 +73,9 @@ function AnswerBody({ turn, shouldStream }: { turn: AssistantTurn; shouldStream:
               {answer.action.label}
             </Link>
           )}
-          <p className="text-caption text-mute">Ringkasan otomatis. Periksa sumbernya sebelum mengambil keputusan.</p>
+          <p className="text-caption text-mute">
+            <Istilah term="ringkasanOtomatis">Ringkasan otomatis</Istilah>. Periksa sumbernya sebelum mengambil keputusan.
+          </p>
         </>
       ) : null}
     </div>
@@ -216,7 +219,7 @@ function AssistantPanel() {
             </Button>
           </div>
           <p className="font-mono text-caption tabular-nums text-mute">
-            {isLimited ? DAILY_LIMIT : usedToday} dari {DAILY_LIMIT} pertanyaan hari ini
+            {isLimited ? DAILY_LIMIT : usedToday} dari {DAILY_LIMIT} <Istilah term="kuotaPertanyaan">pertanyaan hari ini</Istilah>
           </p>
         </form>
       </SheetContent>

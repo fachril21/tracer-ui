@@ -7,7 +7,9 @@ import { LiveWatchSheet } from "@/components/live/live-watch-sheet";
 import { PageSpread } from "@/components/live/page-spread";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Istilah } from "@/components/ui/istilah";
 import { Segmented } from "@/components/ui/segmented";
+import type { SegmentedOption } from "@/components/ui/segmented";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useLive } from "@/state/live-context";
@@ -15,9 +17,9 @@ import { useActiveProject } from "@/state/use-active-project";
 
 type Scope = "semua" | "bermasalah";
 
-const SCOPE_OPTIONS: { value: Scope; label: string }[] = [
+const SCOPE_OPTIONS: SegmentedOption<Scope>[] = [
   { value: "semua", label: "Semua" },
-  { value: "bermasalah", label: "Bersinyal masalah" },
+  { value: "bermasalah", label: "Bersinyal masalah", term: "bersinyalMasalah" },
 ];
 
 function Notice({ children }: { children: string }) {
@@ -61,12 +63,17 @@ function LiveUsersPage() {
       <header className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <h1 className="text-page-title font-semibold text-ink">Live Users</h1>
-          {installation === "detected" ? <LiveIndicator connection={live.connection} isPaused={live.isPaused} /> : null}
+          {installation === "detected" ? (
+            <Istilah term="statusLive">
+              <LiveIndicator connection={live.connection} isPaused={live.isPaused} />
+            </Istilah>
+          ) : null}
         </div>
         {installation === "detected" ? (
           <p className="text-caption text-mute">
             <span className="font-mono tabular-nums">{formatCount(live.activeCount)}</span>
-            {" pengunjung aktif"}
+            {" "}
+            <Istilah term="pengunjungAktif">pengunjung aktif</Istilah>
             {byDevice.length === 0 ? null : (
               <span className="font-mono tabular-nums">
                 {` · ${byDevice.map((item) => `${item.device} ${item.count}`).join(" · ")}`}

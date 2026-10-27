@@ -6,6 +6,7 @@ import { WireframePage } from "@/components/replay/replay-stage";
 import { buttonVariants } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/code-block";
 import { TextField } from "@/components/ui/input";
+import { Istilah } from "@/components/ui/istilah";
 import { Panel } from "@/components/ui/panel";
 import { Segmented } from "@/components/ui/segmented";
 import { SwitchField } from "@/components/ui/switch";
@@ -49,7 +50,9 @@ function FeedbackWidgetPage() {
           <ArrowLeft className="size-3.5" aria-hidden="true" />
           Kembali ke Feedback
         </Link>
-        <h1 className="text-page-title font-semibold text-ink">Widget masukan</h1>
+        <h1 className="text-page-title font-semibold text-ink">
+          <Istilah term="widget">Widget masukan</Istilah>
+        </h1>
         <p className="max-w-prose text-body text-mute">
           Tab kecil di pinggir layar website Anda. Pengunjung membukanya untuk menulis masukan tanpa meninggalkan halaman.
         </p>

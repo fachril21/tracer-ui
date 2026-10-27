@@ -1,4 +1,7 @@
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatCount } from "@/lib/format";
+import { GLOSSARY } from "@/lib/glossary";
+import type { GlossaryKey } from "@/lib/glossary";
 import { cn } from "@/lib/utils";
 
 type BreakdownTone = "primary" | "warning" | "danger" | "charcoal";
@@ -19,6 +22,8 @@ type BreakdownRow = {
   // Lebar batang 0 sampai 100
   share: number;
   tone: BreakdownTone;
+  // Penjelasan istilah pada label, tampil saat hover atau fokus
+  term?: GlossaryKey;
 };
 
 type BreakdownListProps = {
@@ -54,13 +59,11 @@ function BreakdownList({ rows, onSelect, selectedId, selectLabel }: BreakdownLis
       {rows.map((row) => {
         const isSelected = row.id === selectedId;
         const isDimmed = hasSelection && !isSelected;
-        return (
-          <li key={row.id}>
-            {onSelect === undefined ? (
-              <div className="flex flex-col gap-1.5 px-2 py-1">
-                <RowBody row={row} />
-              </div>
-            ) : (
+        const rowBody = onSelect === undefined ? (
+          <div className="flex flex-col gap-1.5 px-2 py-1">
+            <RowBody row={row} />
+          </div>
+        ) : (
               <button
                 type="button"
                 aria-pressed={isSelected}
@@ -74,6 +77,18 @@ function BreakdownList({ rows, onSelect, selectedId, selectLabel }: BreakdownLis
               >
                 <RowBody row={row} />
               </button>
+        );
+        return (
+          <li key={row.id}>
+            {row.term === undefined ? (
+              rowBody
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>{rowBody}</TooltipTrigger>
+                <TooltipContent side="left" className="max-w-64 px-2.5 py-1.5 leading-snug">
+                  {GLOSSARY[row.term]}
+                </TooltipContent>
+              </Tooltip>
             )}
           </li>
         );
@@ -82,7 +97,7 @@ function BreakdownList({ rows, onSelect, selectedId, selectLabel }: BreakdownLis
   );
 }
 
-function countRows(items: { id: string; label: string; count: number; tone: BreakdownTone }[]): BreakdownRow[] {
+function countRows(items: { id: string; label: string; count: number; tone: BreakdownTone; term?: GlossaryKey }[]): BreakdownRow[] {
   const total = Math.max(
     items.reduce((sum, item) => sum + item.count, 0),
     1,
@@ -93,6 +108,7 @@ function countRows(items: { id: string; label: string; count: number; tone: Brea
     value: formatCount(item.count),
     share: (item.count / total) * 100,
     tone: item.tone,
+    term: item.term,
   }));
 }
 

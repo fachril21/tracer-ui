@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { ArrowRight, Plus } from "lucide-react";
 import { Link } from "react-router";
 import { buttonVariants } from "@/components/ui/button";
+import { Istilah } from "@/components/ui/istilah";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatCount, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -29,7 +30,9 @@ function FunnelPage() {
     <div className="flex flex-col gap-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="text-page-title font-semibold text-ink">Funnel</h1>
+          <h1 className="text-page-title font-semibold text-ink">
+            <Istilah term="funnel">Funnel</Istilah>
+          </h1>
           <p className="text-caption text-mute">Lihat di langkah mana pengunjung berhenti. Data {LIST_DAYS} hari terakhir.</p>
         </div>
         {funnels.length === 0 ? null : createLink}

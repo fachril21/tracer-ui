@@ -2,14 +2,15 @@ import { useState } from "react";
 import { BreakdownList } from "@/components/overview/breakdown-list";
 import { Panel } from "@/components/ui/panel";
 import { Segmented } from "@/components/ui/segmented";
+import type { SegmentedOption } from "@/components/ui/segmented";
 import { DIMENSIONS } from "@/mock/dimensions";
 import type { DashboardFilters, FilterKey } from "@/mock/types";
 
 type DimensionTab = Exclude<FilterKey, "signal" | "page">;
 
-const TABS: { value: DimensionTab; label: string }[] = [
+const TABS: SegmentedOption<DimensionTab>[] = [
   { value: "device", label: "Perangkat" },
-  { value: "source", label: "Sumber" },
+  { value: "source", label: "Sumber", term: "sumber" },
   { value: "browser", label: "Browser" },
   { value: "country", label: "Negara" },
 ];
