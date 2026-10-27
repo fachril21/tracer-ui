@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { formatCount, formatPercent } from "@/lib/format";
 import { stepLabel } from "@/mock/funnels";
 import type { FunnelResult } from "@/mock/funnels";
@@ -37,12 +38,71 @@ const SERIES_FILL = ["fill-primary", "fill-charcoal"] as const;
 
 type FunnelFlowProps = { series: FlowSeries[] };
 
+function pct(value: number): string {
+  return formatPercent(Math.round(value * 10) / 10);
+}
+
+// Batas zona sentuh tiap langkah: titik tengah antar langkah
+function zoneEdges(index: number, total: number): { left: string; width: string } {
+  const left = index === 0 ? 0 : (xAt(index - 1, total) + xAt(index, total)) / 2;
+  const right = index === total - 1 ? 100 : (xAt(index, total) + xAt(index + 1, total)) / 2;
+  return { left: `${left}%`, width: `${right - left}%` };
+}
+
+function StepCard({ series, index, total }: { series: FlowSeries[]; index: number; total: number }) {
+  const first = series[0]?.result.steps[index];
+  if (first === undefined) return null;
+  const x = xAt(index, total);
+  const isRight = x > 50;
+  const isBiggest = series.length === 1 && series[0]?.result.biggestDropIndex === index;
+  return (
+    <div
+      role="presentation"
+      className={cn(
+        "pointer-events-none absolute top-9 z-10 w-52 animate-[pop-in_var(--motion-base)_var(--ease-out)] border border-border-control bg-canvas p-2.5 shadow-overlay",
+        isRight ? "-translate-x-[calc(100%+0.75rem)]" : "translate-x-3",
+      )}
+      style={{ left: `${x}%` }}
+    >
+      <p className={cn("truncate text-caption text-ink", first.step.kind === "page" && "font-mono")}>
+        {index + 1}. {stepLabel(first.step)}
+      </p>
+      <dl className="mt-1.5 grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 text-caption">
+        {series.map((item) => {
+          const step = item.result.steps[index];
+          if (step === undefined) return null;
+          return (
+            <div key={item.name} className="col-span-2 grid grid-cols-subgrid gap-y-0.5">
+              {series.length > 1 ? <dt className="col-span-2 mt-1 font-medium text-charcoal">{item.name}</dt> : null}
+              <dt className="text-mute">Sesi</dt>
+              <dd className="text-right font-mono tabular-nums text-ink">{formatCount(step.count)}</dd>
+              <dt className="text-mute">Dari awal</dt>
+              <dd className="text-right font-mono tabular-nums text-ink">{pct(step.rateFromStart)}</dd>
+              {index > 0 ? (
+                <>
+                  <dt className="text-mute">Lanjut dari langkah sebelumnya</dt>
+                  <dd className="text-right font-mono tabular-nums text-ink">{pct(step.rateFromPrevious)}</dd>
+                  <dt className="text-mute">Berhenti</dt>
+                  <dd className="text-right font-mono tabular-nums text-warning-text">{formatCount(step.dropped)}</dd>
+                </>
+              ) : null}
+            </div>
+          );
+        })}
+      </dl>
+      {index === 0 ? <p className="mt-1.5 text-caption text-mute">Titik awal funnel.</p> : null}
+      {isBiggest ? <p className="mt-1.5 text-caption text-warning-text">Penurunan terbesar di funnel ini.</p> : null}
+    </div>
+  );
+}
+
 // Pita alir: lebar mengikuti jumlah sesi di tiap langkah, pil di atas dan bawah garis pembagi
 function FunnelFlow({ series }: FunnelFlowProps) {
   const primary = series[0]?.result;
   if (primary === undefined || primary.steps.length < 2) return null;
   const total = primary.steps.length;
   const isCompare = series.length > 1;
+  const [active, setActive] = useState<number | null>(null);
 
   const summary = primary.steps
     .map((step) => `${stepLabel(step.step)} ${formatCount(step.count)} sesi`)
@@ -50,7 +110,14 @@ function FunnelFlow({ series }: FunnelFlowProps) {
 
   return (
     <figure className="m-0 flex flex-col gap-2">
-      <div className="relative h-52 sm:h-60">
+      <div className="relative h-52 sm:h-60" onMouseLeave={() => setActive(null)}>
+        {active === null ? null : (
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 bg-primary-soft opacity-60"
+            style={zoneEdges(active, total)}
+          />
+        )}
         <svg
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           preserveAspectRatio="none"
@@ -85,9 +152,12 @@ function FunnelFlow({ series }: FunnelFlowProps) {
           const isBiggest = primary.biggestDropIndex === index;
           return (
             <div key={step.step.id} aria-hidden="true">
-              <span className="absolute inset-y-0 w-px bg-border-control" style={{ left }} />
+              <span className={cn("absolute inset-y-0 w-px", active === index ? "bg-ink" : "bg-border-control")} style={{ left }} />
               <span
-                className="absolute top-0 -translate-x-1/2 border border-hairline bg-canvas px-1.5 py-0.5 font-mono text-caption tabular-nums text-ink"
+                className={cn(
+                  "absolute top-0 -translate-x-1/2 border px-1.5 py-0.5 font-mono text-caption tabular-nums",
+                  active === index ? "border-ink bg-ink text-paper" : "border-hairline bg-canvas text-ink",
+                )}
                 style={{ left }}
               >
                 {formatCount(step.count)}
@@ -104,6 +174,25 @@ function FunnelFlow({ series }: FunnelFlowProps) {
             </div>
           );
         })}
+
+        {primary.steps.map((step, index) => {
+          const zone = zoneEdges(index, total);
+          return (
+            <button
+              key={`zona-${step.step.id}`}
+              type="button"
+              aria-label={`Langkah ${index + 1}, ${stepLabel(step.step)}: ${formatCount(step.count)} sesi, ${pct(step.rateFromStart)} dari awal`}
+              className="absolute inset-y-0 cursor-crosshair focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
+              style={zone}
+              onMouseEnter={() => setActive(index)}
+              onFocus={() => setActive(index)}
+              onBlur={() => setActive(null)}
+              onClick={() => setActive(index)}
+            />
+          );
+        })}
+
+        {active === null ? null : <StepCard series={series} index={active} total={total} />}
       </div>
 
       {isCompare ? (
